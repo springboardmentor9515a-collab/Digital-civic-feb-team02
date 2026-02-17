@@ -1,6 +1,5 @@
 # Civix - Digital Civic Platform
 
-**Team 02 - February 2026**
 
 A digital civic platform built with Node.js, Express, and MongoDB for community engagement and civic services.
 
@@ -148,9 +147,6 @@ JWT_EXPIRY=7d
 CORS_ORIGIN=http://localhost:3000
 ```
 
-**Important**: Never commit the `.env` file to version control!
-
----
 
 ## 📡 API Endpoints
 
@@ -169,39 +165,6 @@ CORS_ORIGIN=http://localhost:3000
 |--------|----------|--------|-------------|
 | GET | `/api/dashboard` | Private | Get user dashboard data |
 
-### Request Examples
-
-**Register User**
-```bash
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123",
-  "role": "citizen"
-}
-```
-
-**Login**
-```bash
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-**Get Current User** (requires JWT token)
-```bash
-GET /api/auth/me
-Authorization: Bearer <your_jwt_token>
-```
-
----
 
 ## 🔒 Security Features
 
