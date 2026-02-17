@@ -2,25 +2,37 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
+import { ApiError } from "@/lib/api";
 
 export default function LoginForm() {
-  const [role, setRole] = useState("Citizen");
+  const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await login(email, password);
+      router.push('/');
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
+    } finally {
       setLoading(false);
-      const userRole = role; // Use selected role
-      alert(`Logged in as ${userRole} (${email})`);
-    }, 1000);
+    }
   }
 
   return (
@@ -47,33 +59,20 @@ export default function LoginForm() {
           <p className="mt-2 text-gray-500">Sign in to continue your civic engagement journey</p>
         </div>
 
-        {/* Role Toggle */}
-        <div className="mb-8 flex rounded-full bg-gray-100 p-1">
-          <button
-            type="button"
-            onClick={() => setRole("Citizen")}
-            className={`flex-1 rounded-full py-2 text-sm font-medium transition-all ${role === "Citizen" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}
-          >
-            Citizen
-          </button>
-          <button
-            type="button"
-            onClick={() => setRole("Official")}
-            className={`flex-1 rounded-full py-2 text-sm font-medium transition-all ${role === "Official" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}
-          >
-            Official
-          </button>
-        </div>
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            {error}
+          </div>
+        )}
 
-        {/* Dynamic Form Structure based on Role (Visual change mostly for context) */}
+        {/* Dynamic Form Structure */}
         <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
           <h2 className="mb-1 text-sm font-semibold text-gray-900">
-            Sign In as {role}
+            Sign In
           </h2>
           <p className="mb-6 text-xs text-gray-500">
-            {role === "Citizen" ? "Manage responses and governance" : "Access official dashboard"}
+            Enter your credentials to access your account
           </p>
 
           <form onSubmit={handleLogin} className="space-y-5">

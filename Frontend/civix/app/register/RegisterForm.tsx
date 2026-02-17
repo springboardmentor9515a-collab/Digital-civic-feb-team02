@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Upload, Check, ShieldCheck, Activity, Users } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/lib/AuthContext";
+import { ApiError } from "@/lib/api";
 
 export default function RegisterForm() {
-  const [role, setRole] = useState("Citizen");
+  const router = useRouter();
+  const { register } = useAuth();
+  const [role, setRole] = useState("citizen");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -14,19 +19,37 @@ export default function RegisterForm() {
   const [file, setFile] = useState<File | null>(null);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreed) {
-      alert("Please agree to the Terms of Service");
+      setError("Please agree to the Terms of Service");
       return;
     }
+    
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    setError("");
+
+    try {
+      const fullName = `${firstName} ${lastName}`;
+      await register({
+        name: fullName,
+        email,
+        password,
+        role,
+        location,
+      });
+      router.push('/');
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
+    } finally {
       setLoading(false);
-      alert("Registration simulated!");
-    }, 1500);
+    }
   };
 
   return (
@@ -57,29 +80,36 @@ export default function RegisterForm() {
         <div className="mb-8 flex rounded-full bg-gray-100 p-1">
           <button
             type="button"
-            onClick={() => setRole("Citizen")}
-            className={`flex-1 rounded-full py-2 text-sm font-medium transition-all ${role === "Citizen" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+            onClick={() => setRole("citizen")}
+            className={`flex-1 rounded-full py-2 text-sm font-medium transition-all ${role === "citizen" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
               }`}
           >
             Citizen
           </button>
           <button
             type="button"
-            onClick={() => setRole("Official")}
-            className={`flex-1 rounded-full py-2 text-sm font-medium transition-all ${role === "Official" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+            onClick={() => setRole("official")}
+            className={`flex-1 rounded-full py-2 text-sm font-medium transition-all ${role === "official" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
               }`}
           >
             Government Official
           </button>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            {error}
+          </div>
+        )}
+
         {/* Conditional Header based on Role */}
         <div className="mb-6">
           <h2 className="text-base font-semibold text-gray-900">
-            {role === "Citizen" ? "Register as Citizen" : "Register as Official"}
+            {role === "citizen" ? "Register as Citizen" : "Register as Official"}
           </h2>
           <p className="text-sm text-gray-500">
-            {role === "Citizen"
+            {role === "citizen"
               ? "Engage with your community and track progress"
               : "Manage and respond to civic issues"}
           </p>
