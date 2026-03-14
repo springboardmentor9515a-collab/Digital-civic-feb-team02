@@ -113,9 +113,17 @@ function OfficialDashboard({ user }: { user: { name: string; role: string; locat
                 <MapPin className="h-4 w-4" /> Managing petitions in <strong>{user.location}</strong>
               </p>
             </div>
-            <button onClick={load} className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-gray-200 dark:border-gray-700 px-4 py-2 rounded-lg transition-colors">
-              <RefreshCw className="h-4 w-4" /> Refresh
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/polls"
+                className="flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-4 py-2 rounded-lg transition-colors font-medium"
+              >
+                <BarChart3 className="h-4 w-4" /> Manage Polls
+              </Link>
+              <button onClick={load} className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-gray-200 dark:border-gray-700 px-4 py-2 rounded-lg transition-colors">
+                <RefreshCw className="h-4 w-4" /> Refresh
+              </button>
+            </div>
           </div>
         </div>
 
@@ -244,7 +252,7 @@ function CitizenDashboard({ user }: { user: { name: string; role: string; locati
         </div>
 
         {/* Quick Actions — citizens can create & browse */}
-        <div className="grid sm:grid-cols-2 gap-4 mb-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           <button
             onClick={() => router.push("/petitions/create")}
             className="flex items-center gap-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-6 transition-colors text-left"
@@ -267,6 +275,18 @@ function CitizenDashboard({ user }: { user: { name: string; role: string; locati
             <div>
               <p className="font-bold text-lg">Browse Petitions</p>
               <p className="text-gray-500 dark:text-gray-400 text-sm">View and sign active petitions</p>
+            </div>
+          </button>
+          <button
+            onClick={() => router.push("/polls")}
+            className="flex items-center gap-4 bg-white dark:bg-gray-800 hover:border-indigo-400 dark:hover:border-indigo-500 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl p-6 transition-colors text-left"
+          >
+            <div className="h-12 w-12 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center shrink-0">
+              <BarChart3 className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <div>
+              <p className="font-bold text-lg">Browse Polls</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Vote on community polls</p>
             </div>
           </button>
         </div>
