@@ -3,10 +3,50 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FileText, MapPin, List, Send, Plus, Trash2, Lock } from "lucide-react";
+import { FileText, MapPin, List, Send, Plus, Trash2, Lock, ChevronDown } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { pollApi } from "@/lib/api";
 import Navbar from "@/components/Navbar";
+
+const TAMIL_NADU_LOCATIONS = [
+  "Ariyalur",
+  "Chengalpattu",
+  "Chennai",
+  "Coimbatore",
+  "Cuddalore",
+  "Dharmapuri",
+  "Dindigul",
+  "Erode",
+  "Kallakurichi",
+  "Kancheepuram",
+  "Karur",
+  "Krishnagiri",
+  "Madurai",
+  "Mayiladuthurai",
+  "Nagapattinam",
+  "Namakkal",
+  "Nilgiris",
+  "Perambalur",
+  "Pudukkottai",
+  "Ramanathapuram",
+  "Ranipet",
+  "Salem",
+  "Sivaganga",
+  "Tenkasi",
+  "Thanjavur",
+  "Theni",
+  "Thoothukudi",
+  "Tiruchirappalli",
+  "Tirunelveli",
+  "Tirupathur",
+  "Tiruppur",
+  "Tiruvallur",
+  "Tiruvannamalai",
+  "Tiruvarur",
+  "Vellore",
+  "Viluppuram",
+  "Virudhunagar",
+];
 
 export default function CreatePollPage() {
   const router = useRouter();
@@ -233,14 +273,27 @@ export default function CreatePollPage() {
                   <MapPin className="h-4 w-4" />
                   Target Location *
                 </label>
-                <input
-                  type="text"
-                  required
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600"
-                  placeholder="City, State, or Region"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                />
+                <div className="relative">
+                  <select
+                    required
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 pr-10 text-sm text-gray-900 dark:text-white outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 cursor-pointer"
+                  >
+                    <option value="" disabled>
+                      Select a district / city
+                    </option>
+                    {TAMIL_NADU_LOCATIONS.map((loc) => (
+                      <option key={loc} value={loc.toUpperCase()}>
+                        {loc}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                </div>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  Select the district this poll targets
+                </p>
               </div>
 
               {/* Actions */}

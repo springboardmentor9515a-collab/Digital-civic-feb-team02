@@ -11,7 +11,7 @@ interface Poll {
   id: string;
   _id?: string;
   title: string;
-  location: string;
+  targetLocation: string;
   totalVotes: number;
 }
 
@@ -55,7 +55,7 @@ export default function PollsPage() {
   const filtered = polls.filter((p) =>
     search
       ? p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.location.toLowerCase().includes(search.toLowerCase())
+        (p.targetLocation || "").toLowerCase().includes(search.toLowerCase())
       : true
   );
 
@@ -203,7 +203,7 @@ export default function PollsPage() {
                     <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400 mt-4 border-t border-gray-100 dark:border-gray-700 pt-4">
                       <span className="flex items-center gap-1">
                         <MapPin className="h-4 w-4 text-indigo-500" />
-                        {poll.location}
+                        {poll.targetLocation || "—"}
                       </span>
                       <span className="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 px-2.5 py-1 rounded-md font-medium">
                         {poll.totalVotes || 0} Votes
