@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
 import { useTheme } from "@/lib/ThemeContext";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, FileText, PlusCircle, LogOut, Moon, Sun } from "lucide-react";
+import { LayoutDashboard, FileText, PlusCircle, LogOut, Moon, Sun, TrendingUp } from "lucide-react";
 import Logo from "@/components/Logo";
 
 export default function Navbar() {
@@ -59,6 +59,13 @@ export default function Navbar() {
                 >
                   <FileText className="h-4 w-4" />
                   <span className="hidden sm:inline">Petitions</span>
+                </Link>
+                <Link
+                  href="/polls"
+                  className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 px-3 py-2 rounded-md transition"
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="hidden sm:inline">Polls</span>
                 </Link>
                 {user.role === "citizen" && (
                   <Link

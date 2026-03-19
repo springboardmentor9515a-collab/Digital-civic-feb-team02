@@ -164,3 +164,36 @@ export const petitionApi = {
     });
   },
 };
+
+// Poll API
+export const pollApi = {
+  getAll: async (filters?: { location?: string }) => {
+    const queryParams = new URLSearchParams();
+    if (filters?.location) queryParams.append('location', filters.location);
+    const queryString = queryParams.toString();
+    const endpoint = queryString ? `/polls?${queryString}` : '/polls';
+    return fetchApi(endpoint, { method: 'GET' });
+  },
+
+  create: async (pollData: {
+    title: string;
+    options: string[];
+    targetLocation: string;
+  }) => {
+    return fetchApi('/polls', {
+      method: 'POST',
+      body: JSON.stringify(pollData),
+    });
+  },
+
+  getById: async (id: string) => {
+    return fetchApi(`/polls/${id}`, { method: 'GET' });
+  },
+
+  vote: async (id: string, option: string) => {
+    return fetchApi(`/polls/${id}/vote`, {
+      method: 'POST',
+      body: JSON.stringify({ option }),
+    });
+  },
+};
