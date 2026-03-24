@@ -20,12 +20,12 @@ const isCitizen = (req, res, next) => {
  * Restrict access to officials only
  */
 const isOfficial = (req, res, next) => {
-  if (req.user && req.user.role === "official") {
+  if (req.user && (req.user.role === "official" || req.user.role === "admin")) {
     return next();
   }
   return res.status(403).json({
     success: false,
-    message: "Access denied. Officials only.",
+    message: "Access denied. Officials or admins only.",
   });
 };
 

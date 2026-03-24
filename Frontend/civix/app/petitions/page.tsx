@@ -51,6 +51,7 @@ interface Petition {
 export default function PetitionsPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const canViewAllPetitions = user?.role === "official" || user?.role === "admin";
 
   const [petitions, setPetitions] = useState<Petition[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,11 +103,13 @@ export default function PetitionsPage() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <TrendingUp className="h-8 w-8 text-indigo-600" />
-              Petitions
+              {canViewAllPetitions ? "All Petitions" : "My Petitions"}
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">
-              Browse and support civic petitions in your community
-            </p>
+              <p className="text-gray-500 dark:text-gray-400 mt-1">
+               {canViewAllPetitions
+                 ? "View and manage all users' petitions"
+                 : "View and manage petitions you created"}
+              </p>
           </div>
           {user?.role === "citizen" && (
             <Link
@@ -124,9 +127,9 @@ export default function PetitionsPage() {
           {/* Search */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search petitions..."
+             <input
+               type="text"
+               placeholder={canViewAllPetitions ? "Search petitions..." : "Search my petitions..."}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
@@ -181,8 +184,12 @@ export default function PetitionsPage() {
             <FileText className="h-14 w-14 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
             <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">No petitions found</p>
             <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
-              {search || category || status ? "Try adjusting your filters" : "Be the first to create one!"}
-            </p>
+               {search || category || status
+                 ? "Try adjusting your filters"
+                 : canViewAllPetitions
+                 ? "No petitions available yet."
+                 : "Create your first petition!"}
+              </p>
           </div>
         ) : (
           <>

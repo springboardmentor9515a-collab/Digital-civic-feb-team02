@@ -1,6 +1,8 @@
 const Petition = require("../models/Petition");
-const User = require("../models/User");
 const Signature = require("../models/Signature");
+
+const canManageAllPetitions = (user) =>
+  user && (user.role === "official" || user.role === "admin");
 
 
 const createPetition = async (req, res, next) => {
@@ -41,6 +43,10 @@ const getAllPetitions = async (req, res, next) => {
     const { location, category, status, page = 1, limit = 10 } = req.query;
 
     const filter = {};
+
+    if (!canManageAllPetitions(req.user)) {
+      filter.creator = req.user._id;
+    }
     
     // Apply filters based on query parameters
     if (category) filter.category = category;
@@ -49,11 +55,7 @@ const getAllPetitions = async (req, res, next) => {
     // Location-based filtering
     if (location) {
       filter.location = location;
-    } else if (req.user && req.user.role === "official") {
-      // Officials can only view petitions in their location
-      filter.location = req.user.location;
     }
-    // Citizens can view all petitions (no location filter unless specified)
 
     // Pagination
     const pageNum = parseInt(page, 10);
@@ -84,8 +86,10 @@ const getAllPetitions = async (req, res, next) => {
 
 const getPetitionById = async (req, res, next) => {
   try {
-    const petition = await Petition.findById(req.params.id)
-      .populate("creator", "name email role location");
+    const petition = canManageAllPetitions(req.user)
+      ? await Petition.findById(req.params.id).populate("creator", "name email role location")
+      : await Petition.findOne({ _id: req.params.id, creator: req.user._id })
+          .populate("creator", "name email role location");
 
     if (!petition) {
       return res.status(404).json({
@@ -130,6 +134,13 @@ const signPetition = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: "Petition not found",
+      });
+    }
+
+    if (petition.creator.toString() === userId.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot sign your own petition",
       });
     }
 
@@ -198,7 +209,9 @@ const getPetitionSignatures = async (req, res, next) => {
     const { page = 1, limit = 20 } = req.query;
 
     // Check if petition exists
-    const petition = await Petition.findById(id);
+    const petition = canManageAllPetitions(req.user)
+      ? await Petition.findById(id)
+      : await Petition.findOne({ _id: id, creator: req.user._id });
     if (!petition) {
       return res.status(404).json({
         success: false,
@@ -240,12 +253,7 @@ const getPetitionSignatures = async (req, res, next) => {
 // Get petition statistics
 const getPetitionStats = async (req, res, next) => {
   try {
-    const filter = {};
-
-    // Officials can only see stats for their location
-    if (req.user && req.user.role === "official") {
-      filter.location = req.user.location;
-    }
+    const filter = canManageAllPetitions(req.user) ? {} : { creator: req.user._id };
 
     const totalPetitions = await Petition.countDocuments(filter);
     const activePetitions = await Petition.countDocuments({ ...filter, status: "active" });
@@ -259,24 +267,18 @@ const getPetitionStats = async (req, res, next) => {
       { $sort: { count: -1 } },
     ]);
 
-    // Get petitions by location (only for citizens or no filter)
-    let petitionsByLocation = [];
-    if (!req.user || req.user.role === "citizen") {
-      petitionsByLocation = await Petition.aggregate([
-        { $group: { _id: "$location", count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 10 },
-      ]);
-    }
+    // Get petitions by location for current user's own petitions
+    const petitionsByLocation = await Petition.aggregate([
+      { $match: filter },
+      { $group: { _id: "$location", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+    ]);
 
     // Get total signatures
     let totalSignatures = 0;
-    if (Object.keys(filter).length === 0) {
-      totalSignatures = await Signature.countDocuments();
-    } else {
-      const petitionIds = await Petition.find(filter).distinct("_id");
-      totalSignatures = await Signature.countDocuments({ petition: { $in: petitionIds } });
-    }
+    const petitionIds = await Petition.find(filter).distinct("_id");
+    totalSignatures = await Signature.countDocuments({ petition: { $in: petitionIds } });
 
     res.status(200).json({
       success: true,
@@ -308,17 +310,11 @@ const updatePetitionStatus = async (req, res, next) => {
       });
     }
 
-    const petition = await Petition.findById(req.params.id);
+    const petition = canManageAllPetitions(req.user)
+      ? await Petition.findById(req.params.id)
+      : await Petition.findOne({ _id: req.params.id, creator: req.user._id });
     if (!petition) {
       return res.status(404).json({ success: false, message: "Petition not found" });
-    }
-
-    // Officials can only manage petitions in their own location
-    if (req.user.role === "official" && petition.location !== req.user.location) {
-      return res.status(403).json({
-        success: false,
-        message: "You can only manage petitions in your location"
-      });
     }
 
     petition.status = status;

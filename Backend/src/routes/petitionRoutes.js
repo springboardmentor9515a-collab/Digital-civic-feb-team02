@@ -12,20 +12,20 @@ const {
   getMyPetitions,
 } = require("../controllers/petitionController");
 
-const { protect, optionalAuth } = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 const { isCitizen, isOfficial } = require("../middleware/roleMiddleware");
 
-// Public routes
-router.get("/", optionalAuth, getAllPetitions);
-router.get("/stats", optionalAuth, getPetitionStats);
+// Authenticated owner-only read routes
+router.get("/", protect, getAllPetitions);
+router.get("/stats", protect, getPetitionStats);
 
 // Citizen-only routes (must be before /:id to avoid being swallowed by that pattern)
 router.get("/user/mine", protect, isCitizen, getMyPetitions);
 router.post("/", protect, isCitizen, createPetition);
 
 // Routes with :id param
-router.get("/:id", getPetitionById);
-router.get("/:id/signatures", getPetitionSignatures);
+router.get("/:id", protect, getPetitionById);
+router.get("/:id/signatures", protect, getPetitionSignatures);
 router.post("/:id/sign", protect, isCitizen, signPetition);
 
 // Official-only routes

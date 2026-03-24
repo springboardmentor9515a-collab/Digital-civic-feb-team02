@@ -55,6 +55,19 @@ const petitionSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // Official Response Fields (Milestone 4)
+    officialResponse: {
+      type: String,
+      trim: true,
+      maxlength: [2000, "Response cannot exceed 2000 characters"],
+    },
+    respondedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    respondedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

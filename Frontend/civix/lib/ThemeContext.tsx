@@ -18,17 +18,16 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Initialize with correct theme from the start
-    if (typeof window !== "undefined") {
-      const savedTheme = localStorage.getItem("theme") as Theme | null;
-      if (savedTheme) {
-        return savedTheme;
-      }
-      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    }
-    return "light";
-  });
+  const [theme, setTheme] = useState<Theme>("light");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as Theme | null;
+    const resolvedTheme =
+      savedTheme ??
+      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+
+    setTheme(resolvedTheme);
+  }, []);
 
   // Apply theme on mount and when theme changes
   useEffect(() => {

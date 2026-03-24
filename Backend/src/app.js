@@ -10,6 +10,8 @@ const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const petitionRoutes = require("./routes/petitionRoutes");
 const pollRoutes = require("./routes/pollRoutes");
+const governanceRoutes = require("./routes/governanceRoutes");
+const reportRoutes = require("./routes/reportRoutes");
 
 // Import middleware
 const { errorHandler, notFound } = require("./middleware/errorMiddleware");
@@ -83,6 +85,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/petitions", petitionRoutes);
 app.use("/api/polls", pollRoutes);
+app.use("/api/governance", governanceRoutes);
+app.use("/api/reports", reportRoutes);
 
 // --------------- Error Handling ---------------
 app.use(notFound);

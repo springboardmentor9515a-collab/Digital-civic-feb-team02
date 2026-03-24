@@ -63,7 +63,7 @@ function OfficialDashboard({ user }: { user: { name: string; role: string; locat
     setLoading(true);
     try {
       const [pRes, sRes] = await Promise.all([
-        petitionApi.getAll({ location: user.location }),
+        petitionApi.getAll(),
         petitionApi.getStats(),
       ]);
       if (pRes.success) setPetitions(pRes.petitions || []);
@@ -96,55 +96,83 @@ function OfficialDashboard({ user }: { user: { name: string; role: string; locat
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        {/* Header */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8 mb-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
+      {/* Hero Header with Background Image */}
+      <div className="relative h-[240px] overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1577495508048-b635879837f1?w=1920&q=80')`,
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-900/75" />
+        <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
+          <div className="flex items-center justify-between w-full">
             <div>
-              <div className="flex items-center gap-3 mb-1">
-                <div className="h-10 w-10 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-indigo-500 rounded-lg">
+                  <Shield className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/50 px-2 py-0.5 rounded">Official</span>
+                <span className="px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full text-xs font-medium text-white border border-white/20">
+                  Official Dashboard
+                </span>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome, {user.name}</h1>
-              <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1.5">
-                <MapPin className="h-4 w-4" /> Managing petitions in <strong>{user.location}</strong>
+              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                Welcome, {user.name}
+              </h1>
+              <p className="text-gray-300 mt-2 flex items-center gap-1.5 text-sm">
+                <MapPin className="h-4 w-4" /> Managing all petitions across users
               </p>
             </div>
-            <button onClick={load} className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-gray-200 dark:border-gray-700 px-4 py-2 rounded-lg transition-colors">
+            <button onClick={load} className="flex items-center gap-2 text-sm text-white/80 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-lg transition-all">
               <RefreshCw className="h-4 w-4" /> Refresh
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-12">
 
         {/* Stats */}
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {[
-              { label: "Total", value: stats.totalPetitions, icon: BarChart3, color: "text-indigo-600 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-400" },
-              { label: "Active", value: stats.activePetitions, icon: CheckCircle, color: "text-green-600 bg-green-100 dark:bg-green-900 dark:text-green-400" },
-              { label: "Under Review", value: stats.underReviewPetitions, icon: AlertCircle, color: "text-yellow-600 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-400" },
-              { label: "Closed", value: stats.closedPetitions, icon: XCircle, color: "text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-400" },
-            ].map(({ label, value, icon: Icon, color }) => (
-              <div key={label} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
-                <div className={`h-10 w-10 rounded-lg flex items-center justify-center mb-3 ${color}`}>
-                  <Icon className="h-5 w-5" />
-                </div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-5 shadow-md">
+              <div className="h-10 w-10 rounded-lg flex items-center justify-center mb-3 bg-indigo-50 dark:bg-indigo-900/30">
+                <BarChart3 className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
-            ))}
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalPetitions}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-5 shadow-md">
+              <div className="h-10 w-10 rounded-lg flex items-center justify-center mb-3 bg-emerald-50 dark:bg-emerald-900/30">
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.activePetitions}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Active</p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-5 shadow-md">
+              <div className="h-10 w-10 rounded-lg flex items-center justify-center mb-3 bg-amber-50 dark:bg-amber-900/30">
+                <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.underReviewPetitions}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Under Review</p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-5 shadow-md">
+              <div className="h-10 w-10 rounded-lg flex items-center justify-center mb-3 bg-gray-100 dark:bg-gray-700">
+                <XCircle className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.closedPetitions}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Closed</p>
+            </div>
           </div>
         )}
 
         {/* Petitions management table */}
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Petitions in {user.location}
-            </h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              All Petitions
+              </h2>
             <span className="text-sm text-gray-500 dark:text-gray-400">{petitions.length} total</span>
           </div>
 
@@ -155,7 +183,7 @@ function OfficialDashboard({ user }: { user: { name: string; role: string; locat
           ) : petitions.length === 0 ? (
             <div className="text-center py-16">
               <FileText className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-500 dark:text-gray-400">No petitions in your location yet.</p>
+              <p className="text-gray-500 dark:text-gray-400">No petitions found.</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -223,31 +251,47 @@ function CitizenDashboard({ user }: { user: { name: string; role: string; locati
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        {/* Header */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8 mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-10 w-10 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center">
-              <Users className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+      {/* Hero Header with Background Image */}
+      <div className="relative h-[240px] overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80')`,
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-900/75" />
+        <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-indigo-500 rounded-lg">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <span className="px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full text-xs font-medium text-white border border-white/20">
+                Citizen Dashboard
+              </span>
             </div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/50 px-2 py-0.5 rounded">Citizen</span>
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome back, {user.name}</h1>
-          <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
-            <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{user.location}</span>
-            <span className={`flex items-center gap-1 ${user.isVerified ? "text-green-600 dark:text-green-400" : "text-yellow-600 dark:text-yellow-500"}`}>
-              {user.isVerified ? <CheckCircle className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
-              {user.isVerified ? "Verified" : "Pending Verification"}
-            </span>
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+              Welcome back, {user.name}
+            </h1>
+            <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-300">
+              <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4" />{user.location}</span>
+              <span className={`flex items-center gap-1.5 ${user.isVerified ? "text-emerald-400" : "text-amber-400"}`}>
+                {user.isVerified ? <CheckCircle className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
+                {user.isVerified ? "Verified" : "Pending Verification"}
+              </span>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Quick Actions — citizens can create & browse */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-12">
+
+        {/* Quick Actions */}
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
           <button
             onClick={() => router.push("/petitions/create")}
-            className="flex items-center gap-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-6 transition-colors text-left"
+            className="flex items-center gap-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-6 transition-colors text-left shadow-lg"
           >
             <div className="h-12 w-12 bg-indigo-500 rounded-lg flex items-center justify-center shrink-0">
               <Plus className="h-6 w-6" />
@@ -259,14 +303,14 @@ function CitizenDashboard({ user }: { user: { name: string; role: string; locati
           </button>
           <button
             onClick={() => router.push("/petitions")}
-            className="flex items-center gap-4 bg-white dark:bg-gray-800 hover:border-indigo-400 dark:hover:border-indigo-500 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl p-6 transition-colors text-left"
+            className="flex items-center gap-4 bg-white dark:bg-gray-800 hover:border-indigo-400 dark:hover:border-indigo-500 border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl p-6 transition-colors text-left shadow-md"
           >
             <div className="h-12 w-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center shrink-0">
               <TrendingUp className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div>
-              <p className="font-bold text-lg">Browse Petitions</p>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">View and sign active petitions</p>
+              <p className="font-bold text-lg">My Petitions</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">View petitions you created</p>
             </div>
           </button>
         </div>
@@ -343,7 +387,7 @@ export default function DashboardPage() {
 
   if (!user) return null;
 
-  return user.role === "official"
+  return user.role === "official" || user.role === "admin"
     ? <OfficialDashboard user={user} />
     : <CitizenDashboard user={user} />;
 }
